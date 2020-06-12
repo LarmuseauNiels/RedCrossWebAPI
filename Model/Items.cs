@@ -9,20 +9,18 @@ namespace RedCrossBackend.Model
     {
         public int id { get; set; }
         public string name { get; set; }
-    }
-    public class Setting
-    {
-        public int id { get; set; }
-        public string name { get; set; }
+        public Assistance(){}
     }
     public class Injury
     {
         public int id { get; set; }
         public string name { get; set; }
+        public Injury(){}
     }
     public class PhType
     {
         public int id { get; set; }
         public string name { get; set; }
+        public PhType(){}
     }
 }

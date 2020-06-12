@@ -10,23 +10,20 @@ namespace RedCrossBackend.Model
         public int id { get; set; }
         public int fAId { get; set; }
         public int aId { get; set; }
+        public FAAssitance(){}
     }
     public class FAInjury
     {
         public int id { get; set; }
         public int fAId { get; set; }
         public int iId { get; set; }
+        public FAInjury(){}
     }
     public class FAPhType
     {
         public int id { get; set; }
         public int fAId { get; set; }
         public int pTId { get; set; }
-    }
-    public class FASetting
-    {
-        public int id { get; set; }
-        public int fAId { get; set; }
-        public int sId { get; set; }
+        public FAPhType(){}
     }
 }
