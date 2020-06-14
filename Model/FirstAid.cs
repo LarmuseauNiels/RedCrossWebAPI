@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace RedCrossBackend.Model
 {
-    public partial class FirstAid
+    public class FirstAid
     {
-        public int id { get; set; }
+        public int? id { get; set; }
         public DateTime? assignDate { get; set; }
         public string macAddress { get; set; }
         public string gender { get; set; }
@@ -23,6 +23,5 @@ namespace RedCrossBackend.Model
         public bool? phNeeded { get; set; }
         public int? phTimeToArriveMs { get; set; }
         public bool? hospitalisationRequired { get; set; }
-
     }
 }

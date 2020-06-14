@@ -13,13 +13,13 @@ namespace RedCrossBackend.Controllers
     public class AnalyticsController : ControllerBase
     {
 
-        private readonly ILogger<TestController> _logger;
-        private readonly DB_RedCrossContext context;
+        private readonly ILogger<AnalyticsController> _logger;
+        private readonly DB_RedCrossContext _context;
 
-        public AnalyticsController(ILogger<TestController> logger, DB_RedCrossContext dbContext)
+        public AnalyticsController(ILogger<AnalyticsController> logger, DB_RedCrossContext dbContext)
         {
             _logger = logger;
-            context = dbContext;
+            _context = dbContext;
         }
 
         [HttpGet]

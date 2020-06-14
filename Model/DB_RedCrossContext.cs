@@ -8,16 +8,18 @@ namespace RedCrossBackend.Model
     {
         public DB_RedCrossContext()
         {
-        }
 
+        }
         public DB_RedCrossContext(DbContextOptions<DB_RedCrossContext> options)
             : base(options)
         {
+            this.Database.SetCommandTimeout(new TimeSpan(0, 15, 30));
         }
 
+
         public virtual DbSet<Assistance> Assistance { get; set; }
-        public virtual DbSet<Faassistance> Faassistance { get; set; }
-        public virtual DbSet<Fainjury> Fainjury { get; set; }
+        public virtual DbSet<Faassistance> FAAssistance { get; set; }
+        public virtual DbSet<Fainjury> FAInjury { get; set; }
         public virtual DbSet<FaphType> FaphType { get; set; }
         public virtual DbSet<FirstAid> FirstAid { get; set; }
         public virtual DbSet<Injury> Injury { get; set; }
@@ -27,8 +29,7 @@ namespace RedCrossBackend.Model
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=serv-redcross.database.windows.net;Database=DB_RedCross;User Id=sqladmin;Password=Nexios2020;");
+                //optionsBuilder.UseSqlServer("Server=serv-redcross.database.windows.net;Database=DB_RedCross;User Id=sqladmin;Password=Nexios2020;");
             }
         }
 
