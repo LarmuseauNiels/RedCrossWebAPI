@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace RedCrossBackend.DBModel
+namespace RedCrossBackend.Model
 {
     public partial class DB_RedCrossContext : DbContext
     {
@@ -27,7 +27,7 @@ namespace RedCrossBackend.DBModel
         {
             if (!optionsBuilder.IsConfigured)
             {
-            // To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Server=serv-redcross.database.windows.net;Database=DB_RedCross;User Id=sqladmin;Password=Nexios2020;");
             }
         }
@@ -36,9 +36,9 @@ namespace RedCrossBackend.DBModel
         {
             modelBuilder.Entity<Assistance>(entity =>
             {
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.id).HasColumnName("id");
 
-                entity.Property(e => e.Name)
+                entity.Property(e => e.name)
                     .HasColumnName("name")
                     .HasMaxLength(50);
             });
@@ -47,106 +47,106 @@ namespace RedCrossBackend.DBModel
             {
                 entity.ToTable("FAAssistance");
 
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.id).HasColumnName("id");
 
-                entity.Property(e => e.Aid).HasColumnName("AId");
+                entity.Property(e => e.AId).HasColumnName("AId");
 
-                entity.Property(e => e.Faid).HasColumnName("FAId");
+                entity.Property(e => e.FAId).HasColumnName("FAId");
             });
 
             modelBuilder.Entity<Fainjury>(entity =>
             {
                 entity.ToTable("FAInjury");
 
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.id).HasColumnName("id");
 
-                entity.Property(e => e.Faid).HasColumnName("FAId");
+                entity.Property(e => e.FAId).HasColumnName("FAId");
 
-                entity.Property(e => e.Iid).HasColumnName("IId");
+                entity.Property(e => e.IId).HasColumnName("IId");
             });
 
             modelBuilder.Entity<FaphType>(entity =>
             {
                 entity.ToTable("FAPhType");
 
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.id).HasColumnName("id");
 
-                entity.Property(e => e.Faid).HasColumnName("FAId");
+                entity.Property(e => e.FAId).HasColumnName("FAId");
 
-                entity.Property(e => e.Ptid).HasColumnName("PTId");
+                entity.Property(e => e.PTId).HasColumnName("PTId");
             });
 
             modelBuilder.Entity<FirstAid>(entity =>
             {
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.id).HasColumnName("id");
 
-                entity.Property(e => e.Age)
+                entity.Property(e => e.age)
                     .HasColumnName("age")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.AssignDate)
+                entity.Property(e => e.assignDate)
                     .HasColumnName("assignDate")
                     .HasColumnType("date");
 
-                entity.Property(e => e.BlendedTraining).HasColumnName("blendedTraining");
+                entity.Property(e => e.blendedTraining).HasColumnName("blendedTraining");
 
-                entity.Property(e => e.ConfidentApplyingFa).HasColumnName("confidentApplyingFA");
+                entity.Property(e => e.confidentApplyingFA).HasColumnName("confidentApplyingFA");
 
-                entity.Property(e => e.Education)
+                entity.Property(e => e.education)
                     .HasColumnName("education")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.Gender)
+                entity.Property(e => e.gender)
                     .HasColumnName("gender")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.HadFatraining).HasColumnName("hadFATraining");
+                entity.Property(e => e.hadFATraining).HasColumnName("hadFATraining");
 
-                entity.Property(e => e.HospitalisationRequired).HasColumnName("hospitalisationRequired");
+                entity.Property(e => e.hospitalisationRequired).HasColumnName("hospitalisationRequired");
 
-                entity.Property(e => e.Latitude)
+                entity.Property(e => e.latitude)
                     .HasColumnName("latitude")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.Longitude)
+                entity.Property(e => e.longitude)
                     .HasColumnName("longitude")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.MacAddress)
+                entity.Property(e => e.macAddress)
                     .HasColumnName("macAddress")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.NumberOffAttraining).HasColumnName("numberOffATtraining");
+                entity.Property(e => e.numberOffATtraining).HasColumnName("numberOffATtraining");
 
-                entity.Property(e => e.OtjerTrainingProvider)
-                    .HasColumnName("otjerTrainingProvider")
+                entity.Property(e => e.otherTrainingProvider)
+                    .HasColumnName("otherTrainingProvider")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.PhNeeded).HasColumnName("phNeeded");
+                entity.Property(e => e.phNeeded).HasColumnName("phNeeded");
 
-                entity.Property(e => e.PhTimeToArriveMs).HasColumnName("phTimeToArriveMs");
+                entity.Property(e => e.phTimeToArriveMs).HasColumnName("phTimeToArriveMs");
 
-                entity.Property(e => e.Setting)
+                entity.Property(e => e.setting)
                     .HasColumnName("setting")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.TrainingByRc).HasColumnName("trainingByRC");
+                entity.Property(e => e.trainingByRC).HasColumnName("trainingByRC");
             });
 
             modelBuilder.Entity<Injury>(entity =>
             {
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.id).HasColumnName("id");
 
-                entity.Property(e => e.Name)
+                entity.Property(e => e.name)
                     .HasColumnName("name")
                     .HasMaxLength(50);
             });
 
             modelBuilder.Entity<PhType>(entity =>
             {
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.id).HasColumnName("id");
 
-                entity.Property(e => e.Name)
+                entity.Property(e => e.name)
                     .HasColumnName("name")
                     .HasMaxLength(50);
             });

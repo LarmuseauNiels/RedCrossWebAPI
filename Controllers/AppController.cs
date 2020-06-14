@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using RedCrossBackend.DBModel;
+using RedCrossBackend.Model;
 
 namespace RedCrossBackend.Controllers
 {
