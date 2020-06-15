@@ -23,5 +23,11 @@ namespace RedCrossBackend.Model
         public bool? phNeeded { get; set; }
         public int? phTimeToArriveMs { get; set; }
         public bool? hospitalisationRequired { get; set; }
+        public string country { get; set; }
+
+        public FirstAid()
+        {
+
+        }
     }
 }
