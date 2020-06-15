@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using RedCrossBackend.Model;
 
@@ -53,6 +54,9 @@ namespace RedCrossBackend.Controllers
             var inj = _context.Injury.ToList();
             var ass = _context.Assistance.ToList();
             var pht = _context.PhType.ToList();
+
+            //Execute filter here
+
             foreach (var fa in firsAids)
             {
                 string injuries = "";
@@ -64,12 +68,13 @@ namespace RedCrossBackend.Controllers
                     assistances += (assistances.Equals("")) ? "" : ", " + inj.FirstOrDefault(x => x.id == a.AId).name;
                 foreach (var p in _context.FaphType.Where(x => x.FAId == fa.id).ToList())
                     phtypes += (phtypes.Equals("")) ? "" : ", " + inj.FirstOrDefault(x => x.id == p.PTId).name;
-                rawList.Add(new FirstAidRaw());
+                rawList.Add(new FirstAidRaw(fa,injuries,assistances,phtypes));
             }
-            
 
+            if(rawList.Count == 0)
+                return NotFound();
 
-            return NotFound();
+            return rawList;
         }
 
 

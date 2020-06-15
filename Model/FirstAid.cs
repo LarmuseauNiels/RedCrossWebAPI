@@ -24,10 +24,28 @@ namespace RedCrossBackend.Model
         public int? phTimeToArriveMs { get; set; }
         public bool? hospitalisationRequired { get; set; }
         public string country { get; set; }
-
-        public FirstAid()
+        public FirstAid(){}
+        public FirstAid(FirstAid fa)
         {
-
-        }
+            this.id = fa.id;
+            this.assignDate = fa.assignDate;
+            this.macAddress = fa.macAddress;
+            this.gender = fa.gender;
+            this.age = fa.age;
+            this.education = fa.education;
+            this.hadFATraining = fa.hadFATraining;
+            this.numberOffATtraining = fa.numberOffATtraining;
+            this.trainingByRC = fa.trainingByRC;
+            this.blendedTraining = fa.blendedTraining;
+            this.otherTrainingProvider = fa.otherTrainingProvider;
+            this.longitude = fa.longitude;
+            this.latitude = fa.latitude;
+            this.setting = fa.setting;
+            this.confidentApplyingFA = fa.confidentApplyingFA;
+            this.phNeeded = fa.phNeeded;
+            this.phTimeToArriveMs = fa.phTimeToArriveMs;
+            this.hospitalisationRequired = fa.hospitalisationRequired;
+            this.country = fa.country;
+    }
     }
 }
