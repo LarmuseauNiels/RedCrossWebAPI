@@ -29,7 +29,7 @@ namespace RedCrossBackend.Controllers
         //}
 
         [HttpGet]
-        public async  Task<GeocodeResponse> ReverseGeoCode(double lat, double longitu )
+        public GeocodeResponse ReverseGeoCode(double lat, double longitu )
         {
             ReverseGeocoder y = new ReverseGeocoder();
 
@@ -40,7 +40,7 @@ namespace RedCrossBackend.Controllers
                 
 
             });
-            GeocodeResponse resp = await r2;
+            GeocodeResponse resp = r2.Result;
             //string Countrycode = resp.Address.CountryCode;
             return resp;
         }

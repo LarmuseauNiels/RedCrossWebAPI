@@ -16,8 +16,8 @@ namespace RedCrossBackend.Model
         public bool? trainingByRC { get; set; }
         public bool? blendedTraining { get; set; }
         public string otherTrainingProvider { get; set; }
-        public string longitude { get; set; }
-        public string latitude { get; set; }
+        public double longitude { get; set; }
+        public double latitude { get; set; }
         public string setting { get; set; }
         public int? confidentApplyingFA { get; set; }
         public bool? phNeeded { get; set; }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Nominatim.API.Geocoders;
+using Nominatim.API.Models;
 using RedCrossBackend.Model;
 
 namespace RedCrossBackend.Controllers
@@ -26,6 +28,18 @@ namespace RedCrossBackend.Controllers
         public ActionResult<FirstAid> SaveForm(FirstAidDTO dto)
         {
             FirstAid firstAid = dto;
+            ReverseGeocoder y = new ReverseGeocoder();
+
+            Task<GeocodeResponse> r2 = y.ReverseGeocode(new ReverseGeocodeRequest
+            {
+                Latitude = firstAid.latitude,
+                Longitude = firstAid.longitude,
+
+
+            });
+            GeocodeResponse resp =  r2.Result;
+            firstAid.country = resp.Address.Country;
+
             _context.FirstAid.Add(firstAid);
             _context.SaveChanges();
             var id = _context.FirstAid.OrderByDescending(x => x.id).FirstOrDefault().id;

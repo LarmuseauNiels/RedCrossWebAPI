@@ -106,12 +106,10 @@ namespace RedCrossBackend.Model
                 entity.Property(e => e.hospitalisationRequired).HasColumnName("hospitalisationRequired");
 
                 entity.Property(e => e.latitude)
-                    .HasColumnName("latitude")
-                    .HasMaxLength(50);
+                    .HasColumnName("latitude");
 
                 entity.Property(e => e.longitude)
-                    .HasColumnName("longitude")
-                    .HasMaxLength(50);
+                    .HasColumnName("longitude");
 
                 entity.Property(e => e.macAddress)
                     .HasColumnName("macAddress")
