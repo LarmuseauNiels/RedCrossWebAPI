@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Nominatim.API.Geocoders;
+using Nominatim.API.Models;
 
 namespace RedCrossBackend.Controllers
 {
@@ -19,11 +21,28 @@ namespace RedCrossBackend.Controllers
             _logger = logger;
         }
 
+        //[HttpGet]
+        //public Test Get()
+        //{
+        //    var rng = new Random();
+        //    return new Test { example = "Basic Test" };
+        //}
+
         [HttpGet]
-        public Test Get()
+        public async  Task<GeocodeResponse> ReverseGeoCode(double lat, double longitu )
         {
-            var rng = new Random();
-            return new Test { example = "Basic Test" };
+            ReverseGeocoder y = new ReverseGeocoder();
+
+            Task<GeocodeResponse> r2 = y.ReverseGeocode(new ReverseGeocodeRequest
+            {
+                Latitude = lat,
+                Longitude = longitu,
+                
+
+            });
+            GeocodeResponse resp = await r2;
+            //string Countrycode = resp.Address.CountryCode;
+            return resp;
         }
     }
 }
