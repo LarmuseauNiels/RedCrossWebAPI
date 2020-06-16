@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +32,7 @@ namespace RedCrossBackend.Controllers
 
         [HttpGet]
         [Route("assistances")]
-        public ActionResult<List<string>> GetAssistances()
+        public ActionResult<IEnumerable<string>> GetAssistances()
         {
             var ass = _context.Assistance.Select(x=>x.name).ToList();
             if(ass.Count > 0)
@@ -37,9 +41,10 @@ namespace RedCrossBackend.Controllers
             }
             return NotFound();
         }
+       
         [HttpGet]
         [Route("injuries")]
-        public ActionResult<List<string>> GetInjuries()
+        public ActionResult<IEnumerable<string>> GetInjuries()
         {
             var inj = _context.Injury.Select(x => x.name).ToList();
             if (inj.Count > 0)
@@ -48,9 +53,10 @@ namespace RedCrossBackend.Controllers
             }
             return NotFound();
         }
+        
         [HttpGet]
         [Route("countries")]
-        public ActionResult<List<string>> GetCountries()
+        public ActionResult<IEnumerable<string>> GetCountries()
         {
             var countries = _context.FirstAid.Select(x => x.country).Distinct().ToList();
             if (countries.Count > 0)
@@ -59,40 +65,10 @@ namespace RedCrossBackend.Controllers
             }
             return NotFound();
         }
-        [HttpGet]
-        [Route("raw")]
-        public ActionResult<List<FirstAidRaw>> GetRawFirstAid(Filter f)
-        {
-            var rawList = new List<FirstAidRaw>();
-            var firstAidsDB = _context.FirstAid;
-            var inj = _context.Injury.ToList();
-            var ass = _context.Assistance.ToList();
-            var pht = _context.PhType.ToList();
-
-            var firstAids = ExecuteFilter(firstAidsDB, f);
-
-            foreach (var fa in firstAids)
-            {
-                string injuries = "";
-                string assistances = "";
-                string phtypes = "";
-                foreach (var i in _context.FAInjury.Where(x=>x.FAId == fa.id).ToList())
-                    injuries += (injuries.Equals(""))?"": ", " + inj.FirstOrDefault(x => x.id == i.IId).name;
-                foreach (var a in _context.FAAssistance.Where(x => x.FAId == fa.id).ToList())
-                    assistances += (assistances.Equals("")) ? "" : ", " + inj.FirstOrDefault(x => x.id == a.AId).name;
-                foreach (var p in _context.FaphType.Where(x => x.FAId == fa.id).ToList())
-                    phtypes += (phtypes.Equals("")) ? "" : ", " + inj.FirstOrDefault(x => x.id == p.PTId).name;
-                rawList.Add(new FirstAidRaw(fa,injuries,assistances,phtypes));
-            }
-
-            if(rawList.Count == 0)
-                return NotFound();
-
-            return rawList;
-        }
+        
         [HttpGet]
         [Route("stats")]
-        public ActionResult<AnalyticsDTO> GetStatistics(Filter f)
+        public ActionResult<AnalyticsDTO> GetStatistics([FromQuery]Filter f)
         {
             var firstAidsDB = _context.FirstAid;
             var firstAids = ExecuteFilter(firstAidsDB, f);
@@ -100,16 +76,16 @@ namespace RedCrossBackend.Controllers
             var analytics = new AnalyticsDTO();
 
             //byAge
-            analytics.byAge = CalculateCombinationAnalytics(firstAids,"age");
+            analytics.byAge = CalculateCombinationAnalytics(firstAids,1);
 
             //byEducation
-            analytics.byEducation = CalculateCombinationAnalytics(firstAids, "education");
+            analytics.byEducation = CalculateCombinationAnalytics(firstAids, 2);
 
             //byCorrectSolution
-            analytics.byCorrectSolution = CalculateCombinationAnalytics(firstAids, "correctSolution");
+            analytics.byCorrectSolution = CalculateCombinationAnalytics(firstAids, 3);
 
             //byHospitalization
-            analytics.byHospitalization = CalculateCombinationAnalytics(firstAids, "hosp");
+            analytics.byHospitalization = CalculateCombinationAnalytics(firstAids, 4);
 
             //byMap
             var mapList = new List<Coordinates>();
@@ -120,10 +96,10 @@ namespace RedCrossBackend.Controllers
             analytics.byMap = mapList;
 
             //byGender
-            analytics.byGender = CalculateCombinationAnalytics(firstAids, "gender");
+            analytics.byGender = CalculateCombinationAnalytics(firstAids, 5);
 
             //byNumberTraining
-            analytics.byNumberTraining = CalculateCombinationAnalytics(firstAids, "numbertraining");
+            analytics.byNumberTraining = CalculateCombinationAnalytics(firstAids, 6);
 
             //byInjury
             var injuries = _context.Injury.ToList();
@@ -151,16 +127,14 @@ namespace RedCrossBackend.Controllers
             if (rcTraining > 0)
                 trainingList.Add(new Combination("Red Cross FA Training", rcTraining));
             if (otherTraining > 0)
-                trainingList.Add(new Combination("Red Cross FA Training", otherTraining));
+                trainingList.Add(new Combination("Other FA Training", otherTraining));
             if (bothTraining > 0)
-                trainingList.Add(new Combination("Red Cross FA Training", bothTraining));
+                trainingList.Add(new Combination("Red Cross & Other FA Training", bothTraining));
             if (noTraining > 0)
-                trainingList.Add(new Combination("Red Cross FA Training", noTraining));
-
-
+                trainingList.Add(new Combination("No FA Training", noTraining));
 
             //byBlended
-            analytics.byBlended = CalculateCombinationAnalytics(firstAids, "blended");
+            analytics.byBlended = CalculateCombinationAnalytics(firstAids, 7);
 
             //byPercentProfHelp
             double perc = firstAids.Where(x => (x.phNeeded == null)?false:(bool)x.phNeeded).Count() / firstAids.Count()*100;
@@ -170,6 +144,59 @@ namespace RedCrossBackend.Controllers
                 return analytics;
 
             return NotFound();
+        }
+        
+        [HttpGet]
+        [Route("raw")]
+        public ActionResult<IEnumerable<FirstAidRaw>> GetRawFirstAid([FromQuery]Filter f)
+        {
+            var rawList = CreateRawList(f);
+
+            if (rawList.Count == 0)
+                return NotFound();
+
+            return rawList;
+        }
+       
+        [HttpGet]
+        [Route("export")]
+        public ActionResult ExportCSV([FromQuery]Filter f)
+        {
+            var rawList = CreateRawList(f);
+
+
+            if (rawList.Count == 0)
+                return NotFound();
+
+            var sw = new StringWriter();
+            var config = new CsvHelper.Configuration.Configuration()
+            {
+                Delimiter = ";",
+                HasHeaderRecord = false,
+                TrimOptions = CsvHelper.Configuration.TrimOptions.Trim
+            };
+            var csv = new CsvWriter(sw, config);
+
+            /// Add headers
+            foreach (var e in typeof(FirstAidRaw).GetProperties().Select(x=>x.Name))
+            {
+                csv.WriteField(e);
+            }
+            csv.NextRecord();
+
+            var dateNow = DateTime.Now;
+            string fileName = "RedCross_FA_Export_" + dateNow.Day + dateNow.Month + dateNow.Year + dateNow.Hour + dateNow.Minute;
+
+            fileName += ".csv";
+
+            csv.WriteRecords(rawList);
+            csv.Flush();
+
+            var bytes = Encoding.Unicode.GetBytes(sw.ToString());
+            return new FileContentResult(bytes, "application/octet-stream")
+            {
+                FileDownloadName = fileName
+            };
         }
 
         private List<FirstAid> ExecuteFilter(IQueryable<FirstAid> fas,Filter f)
@@ -183,6 +210,10 @@ namespace RedCrossBackend.Controllers
                 query = query.Where(x => x.age.Equals(f.age));
             if (!string.IsNullOrEmpty(f.country))
                 query = query.Where(x => x.country.Equals(f.country));
+            if (f.from.HasValue)
+                query = query.Where(x => x.assignDate >= (DateTime)f.from);
+            if(f.to.HasValue)
+                query = query.Where(x => x.assignDate <= (DateTime)f.to);
             if (!string.IsNullOrEmpty(f.assistance))
             {
                 var assistanceId = _context.Assistance.FirstOrDefault(x => x.name.Equals(f.assistance)).id;
@@ -217,30 +248,37 @@ namespace RedCrossBackend.Controllers
 
             return query.ToList();
         }
-        private List<Combination> CalculateCombinationAnalytics(List<FirstAid> fas, string param)
+        private List<Combination> CalculateCombinationAnalytics(List<FirstAid> fas, int param)
         {
             var distincts = fas.Select(x => x.age).Distinct().ToList();
             switch (param)
             {
-                case "age":
+                //age
+                case 1:
                     distincts = fas.Select(x => x.age).Distinct().ToList();
                     break;
-                case "education":
+                //education
+                case 2:
                     distincts = fas.Select(x => x.education).Distinct().ToList(); 
                     break;
-                case "correctSolution":
+                //correctSolution
+                case 3:
                     distincts = fas.Select(x => x.age).Distinct().ToList(); 
                     break;
-                case "hosp":
+                //hosp
+                case 4:
                     distincts = fas.Select(x => x.hospitalisationRequired.ToString()).Distinct().ToList();
                     break;
-                case "gender":
+                //gender
+                case 5:
                     distincts = fas.Select(x => x.gender).Distinct().ToList();
                     break;
-                case "numbertraining":
+                //numbertraining
+                case 6:
                     distincts = fas.Select(x => x.numberOffATtraining.ToString()).Distinct().ToList();
                     break;
-                case "blended":
+                //blended
+                case 7:
                     distincts = fas.Select(x => x.blendedTraining.ToString()).Distinct().ToList();
                     break;
             }
@@ -250,24 +288,31 @@ namespace RedCrossBackend.Controllers
                 int count = 0;
                 switch (param)
                 {
-                    case "age": count = fas.Where(x => x.age.Equals(el)).Count();
+                    //age
+                    case 1: count = fas.Where(x => x.age.Equals(el)).Count();
                         break;
-                    case "education":
+                    //education
+                    case 2:
                         count = fas.Where(x => x.education.Equals(el)).Count();
                         break;
-                    case "correctSolution":
+                    //correctSolution
+                    case 3:
                         count = fas.Where(x => x.age.Equals(el)).Count();
                         break;
-                    case "hosp":
+                    //hosp
+                    case 4:
                         count = fas.Where(x => x.hospitalisationRequired.ToString().Equals(el)).Count();
                         break;
-                    case "gender":
+                    //gender
+                    case 5:
                         count = fas.Where(x => x.gender.Equals(el)).Count();
                         break;
-                    case "numbertraining":
+                    //numbertraining
+                    case 6:
                         count = fas.Where(x => x.numberOffATtraining.ToString().Equals(el)).Count();
                         break;
-                    case "blended":
+                    //blended
+                    case 7:
                         count = fas.Where(x => x.blendedTraining.ToString().Equals(el)).Count();
                         break;
                 }
@@ -275,6 +320,35 @@ namespace RedCrossBackend.Controllers
             }
                 
             return list;
+        }
+        private List<FirstAidRaw> CreateRawList(Filter f)
+        {
+            var rawList = new List<FirstAidRaw>();
+            var firstAidsDB = _context.FirstAid;
+            var inj = _context.Injury.ToList();
+            var ass = _context.Assistance.ToList();
+            var pht = _context.PhType.ToList();
+
+            var firstAids = ExecuteFilter(firstAidsDB, f);
+
+            foreach (var fa in firstAids)
+            {
+                string injuries = "";
+                string assistances = "";
+                string phtypes = "";
+                var t = _context.FAInjury.Where(x => x.FAId == fa.id).ToList();
+                var asss = _context.FAAssistance.Where(x => x.FAId == fa.id).ToList();
+                var phtdd = _context.FaphType.Where(x => x.FAId == fa.id).ToList();
+                foreach (var i in _context.FAInjury.Where(x => x.FAId == fa.id).ToList())
+                    injuries += ((injuries.Equals("")) ? "" : ", ") + inj.FirstOrDefault(x => x.id == i.IId).name;
+                foreach (var a in _context.FAAssistance.Where(x => x.FAId == fa.id).ToList())
+                    assistances += ((assistances.Equals("")) ? "" : ", ") + ass.FirstOrDefault(x => x.id == a.AId).name;
+                foreach (var p in _context.FaphType.Where(x => x.FAId == fa.id).ToList())
+                    phtypes += ((phtypes.Equals("")) ? "" : ", ") + pht.FirstOrDefault(x => x.id == p.PTId).name;
+                rawList.Add(new FirstAidRaw(fa, injuries, assistances, phtypes));
+            }
+
+            return rawList;
         }
     }
     public class Filter
@@ -285,5 +359,7 @@ namespace RedCrossBackend.Controllers
         public string assistance { get; set; }
         public string age { get; set; }
         public string country { get; set; }
+        public DateTime? from { get; set; }
+        public DateTime? to { get; set; }
     }
 }

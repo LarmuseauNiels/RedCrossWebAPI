@@ -52,21 +52,21 @@ namespace RedCrossBackend.Controllers
             {
                 var inj = injuries.FirstOrDefault(x => x.name.Equals(injury));
                 if (inj != null)
-                    _context.Add(new Fainjury(inj.id, (int)id));
+                    _context.Add(new Fainjury((int)id, inj.id));
             }
             var assistances = _context.Assistance.ToList();
             foreach(var assistance in dto.assistance)
             {
                 var ass = assistances.FirstOrDefault(x => x.name.Equals(assistance));
                 if (ass != null)
-                    _context.Add(new Faassistance(ass.id, (int)id));
+                    _context.Add(new Faassistance((int)id, ass.id));
             }
             var phTypes = _context.PhType.ToList();
             foreach(var phType in dto.phType)
             {
                 var ph = phTypes.FirstOrDefault(x => x.name.Equals(phType));
                 if (ph != null)
-                    _context.Add(new FaphType(ph.id, (int)id));
+                    _context.Add(new FaphType((int)id, ph.id));
             }
             _context.SaveChanges();
             return firstAid;
