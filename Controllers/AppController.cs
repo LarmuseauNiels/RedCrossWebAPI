@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Nominatim.API.Geocoders;
@@ -23,7 +24,7 @@ namespace RedCrossBackend.Controllers
             _logger = logger;
             _context = context;
         }
-
+        [DisableCors]
         [HttpPost]
         public ActionResult<FirstAid> SaveForm(FirstAidDTO dto)
         {
