@@ -31,6 +31,19 @@ namespace RedCrossBackend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy("AllowAll",
+            //        builder =>
+            //        {
+            //            builder
+            //            .AllowAnyOrigin()
+            //            .AllowAnyMethod()
+            //            .AllowAnyHeader()
+            //            .AllowCredentials();
+            //        });
+            //});
+
             services.AddDbContext<DB_RedCrossContext>(options => options.UseSqlServer("Server=serv-redcross.database.windows.net;Database=DB_RedCross;User Id=sqladmin;Password=Nexios2020;"));
 
             /// Add swagger documentation
@@ -49,7 +62,7 @@ namespace RedCrossBackend
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+            //app.UseCors("AllowAll");
 
             app.UseHttpsRedirection();
 
@@ -68,6 +81,7 @@ namespace RedCrossBackend
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "MARS Leasing API V1");
                 c.RoutePrefix = "api";
             });
+
         }
     }
 }

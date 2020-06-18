@@ -22,7 +22,7 @@ namespace RedCrossBackend.Model
         public int? confidentApplyingFA { get; set; }
         public bool? phNeeded { get; set; }
         public int? phTimeToArriveMs { get; set; }
-        public bool? hospitalisationRequired { get; set; }
+        public string hospitalisationRequired { get; set; }
         public string country { get; set; }
         public FirstAid(){}
         public FirstAid(FirstAid fa)

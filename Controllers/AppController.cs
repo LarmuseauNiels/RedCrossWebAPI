@@ -24,7 +24,6 @@ namespace RedCrossBackend.Controllers
             _logger = logger;
             _context = context;
         }
-        [DisableCors]
         [HttpPost]
         public ActionResult<FirstAid> SaveForm(FirstAidDTO dto)
         {
@@ -38,36 +37,44 @@ namespace RedCrossBackend.Controllers
 
 
             });
-            GeocodeResponse resp =  r2.Result;
+            GeocodeResponse resp = r2.Result;
             firstAid.country = resp.Address.Country;
 
             _context.FirstAid.Add(firstAid);
             _context.SaveChanges();
             var id = _context.FirstAid.OrderByDescending(x => x.id).FirstOrDefault().id;
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
-            var injuries = _context.Injury.ToList();
-            foreach(var injury in dto.injury)
+            if (dto.injury != null && dto.injury.Count() > 0)
             {
-                var inj = injuries.FirstOrDefault(x => x.name.Equals(injury));
-                if (inj != null)
-                    _context.Add(new Fainjury((int)id, inj.id));
+                var injuries = _context.Injury.ToList();
+                foreach (var injury in dto.injury)
+                {
+                    var inj = injuries.FirstOrDefault(x => x.name.Equals(injury));
+                    if (inj != null)
+                        _context.Add(new Fainjury((int)id, inj.id));
+                }
             }
-            var assistances = _context.Assistance.ToList();
-            foreach(var assistance in dto.assistance)
-            {
-                var ass = assistances.FirstOrDefault(x => x.name.Equals(assistance));
-                if (ass != null)
-                    _context.Add(new Faassistance((int)id, ass.id));
+            if (dto.assistance != null && dto.assistance.Count() > 0) { 
+                var assistances = _context.Assistance.ToList();
+                foreach (var assistance in dto.assistance)
+                {
+                    var ass = assistances.FirstOrDefault(x => x.name.Equals(assistance));
+                    if (ass != null)
+                        _context.Add(new Faassistance((int)id, ass.id));
+                }
             }
-            var phTypes = _context.PhType.ToList();
-            foreach(var phType in dto.phType)
+            if (dto.phType != null && dto.phType.Count() > 0)
             {
-                var ph = phTypes.FirstOrDefault(x => x.name.Equals(phType));
-                if (ph != null)
-                    _context.Add(new FaphType((int)id, ph.id));
+                var phTypes = _context.PhType.ToList();
+                foreach(var phType in dto.phType)
+                {
+                    var ph = phTypes.FirstOrDefault(x => x.name.Equals(phType));
+                    if (ph != null)
+                        _context.Add(new FaphType((int)id, ph.id));
+                }
             }
             _context.SaveChanges();
             return firstAid;
