@@ -21,7 +21,7 @@ namespace RedCrossBackend.Model
         public string setting { get; set; }
         public int? confidentApplyingFA { get; set; }
         public bool? phNeeded { get; set; }
-        public int? phTimeToArriveMs { get; set; }
+        public string phTimeToArrive { get; set; }
         public string hospitalisationRequired { get; set; }
         public string country { get; set; }
         public FirstAid(){}
@@ -43,7 +43,7 @@ namespace RedCrossBackend.Model
             this.setting = fa.setting;
             this.confidentApplyingFA = fa.confidentApplyingFA;
             this.phNeeded = fa.phNeeded;
-            this.phTimeToArriveMs = fa.phTimeToArriveMs;
+            this.phTimeToArrive = fa.phTimeToArrive;
             this.hospitalisationRequired = fa.hospitalisationRequired;
             this.country = fa.country;
     }

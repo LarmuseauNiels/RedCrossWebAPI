@@ -123,7 +123,8 @@ namespace RedCrossBackend.Model
 
                 entity.Property(e => e.phNeeded).HasColumnName("phNeeded");
 
-                entity.Property(e => e.phTimeToArriveMs).HasColumnName("phTimeToArriveMs");
+                entity.Property(e => e.phTimeToArrive).HasColumnName("phTimeToArrive")
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.setting)
                     .HasColumnName("setting")
