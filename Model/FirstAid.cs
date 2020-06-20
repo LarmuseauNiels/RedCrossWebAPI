@@ -47,5 +47,16 @@ namespace RedCrossBackend.Model
             this.hospitalisationRequired = fa.hospitalisationRequired;
             this.country = fa.country;
     }
+        public void EditBooleans()
+        {
+            if (this.hadFATraining == null)
+                this.hadFATraining = false;
+            if (this.trainingByRC == null)
+                this.trainingByRC = false;
+            if (this.blendedTraining == null)
+                this.blendedTraining = false;
+            if (this.phNeeded == null)
+                this.phNeeded = false;
+    }
     }
 }
