@@ -65,7 +65,22 @@ namespace RedCrossBackend.Controllers
             }
             return NotFound();
         }
-        
+
+        [HttpGet]
+        [Route("educations")]
+        public ActionResult<IEnumerable<string>> GetEductations()
+        {
+            var educations = _context.FirstAid.Select(x => x.education).Distinct().ToList();
+            if (educations.Count > 0)
+            {
+                return educations;
+            }
+            return NotFound();
+        }
+
+
+
+
         [HttpGet]
         [Route("stats")]
         public ActionResult<AnalyticsDTO> GetStatistics([FromQuery]Filter f)
@@ -214,6 +229,8 @@ namespace RedCrossBackend.Controllers
                 query = query.Where(x => x.assignDate >= (DateTime)f.from);
             if(f.to.HasValue)
                 query = query.Where(x => x.assignDate <= (DateTime)f.to);
+            if (!string.IsNullOrEmpty(f.education))
+                query = query.Where(x => x.education.Equals(f.education));
             if (!string.IsNullOrEmpty(f.assistance))
             {
                 var assistanceId = _context.Assistance.FirstOrDefault(x => x.name.Equals(f.assistance)).id;
@@ -267,7 +284,7 @@ namespace RedCrossBackend.Controllers
                     break;
                 //hosp
                 case 4:
-                    distincts = fas.Select(x => x.hospitalisationRequired.ToString()).Distinct().ToList();
+                    distincts = fas.Select(x => (x.hospitalisationRequired != null)?x.hospitalisationRequired.ToString():null).Distinct().ToList();
                     break;
                 //gender
                 case 5:
@@ -275,11 +292,11 @@ namespace RedCrossBackend.Controllers
                     break;
                 //numbertraining
                 case 6:
-                    distincts = fas.Select(x => x.numberOffATtraining.ToString()).Distinct().ToList();
+                    distincts = fas.Select(x => (x.numberOffATtraining != null) ? x.numberOffATtraining.ToString():null).Distinct().ToList();
                     break;
                 //blended
                 case 7:
-                    distincts = fas.Select(x => x.blendedTraining.ToString()).Distinct().ToList();
+                    distincts = fas.Select(x => (x.blendedTraining != null) ? x.blendedTraining.ToString():null).Distinct().ToList();
                     break;
             }
             var list = new List<Combination>();
@@ -289,31 +306,31 @@ namespace RedCrossBackend.Controllers
                 switch (param)
                 {
                     //age
-                    case 1: count = fas.Where(x => x.age.Equals(el)).Count();
+                    case 1: count = fas.Where(x => x.age != null && x.age.Equals(el)).Count();
                         break;
                     //education
                     case 2:
-                        count = fas.Where(x => x.education.Equals(el)).Count();
+                        count = fas.Where(x => x.education != null && x.education.Equals(el)).Count();
                         break;
                     //correctSolution
                     case 3:
-                        count = fas.Where(x => x.age.Equals(el)).Count();
+                        count = fas.Where(x => x.age != null && x.age.Equals(el)).Count();
                         break;
                     //hosp
                     case 4:
-                        count = fas.Where(x => x.hospitalisationRequired.ToString().Equals(el)).Count();
+                        count = fas.Where(x => x.hospitalisationRequired != null && x.hospitalisationRequired.ToString().Equals(el)).Count();
                         break;
                     //gender
                     case 5:
-                        count = fas.Where(x => x.gender.Equals(el)).Count();
+                        count = fas.Where(x => x.gender != null && x.gender.Equals(el)).Count();
                         break;
                     //numbertraining
                     case 6:
-                        count = fas.Where(x => x.numberOffATtraining.ToString().Equals(el)).Count();
+                        count = fas.Where(x => x.numberOffATtraining != null && x.numberOffATtraining.ToString().Equals(el)).Count();
                         break;
                     //blended
                     case 7:
-                        count = fas.Where(x => x.blendedTraining.ToString().Equals(el)).Count();
+                        count = fas.Where(x => x.blendedTraining != null && x.blendedTraining.ToString().Equals(el)).Count();
                         break;
                 }
                 list.Add(new Combination(el,count));
@@ -361,5 +378,6 @@ namespace RedCrossBackend.Controllers
         public string country { get; set; }
         public DateTime? from { get; set; }
         public DateTime? to { get; set; }
+        public string education { get; set; }
     }
 }
