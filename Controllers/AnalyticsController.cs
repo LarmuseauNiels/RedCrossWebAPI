@@ -10,6 +10,7 @@ using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.Logging;
 using RedCrossBackend.Model;
 using RedCrossBackend.Model.DTO;
@@ -87,6 +88,7 @@ namespace RedCrossBackend.Controllers
         {
             var firstAidsDB = _context.FirstAid;
             var firstAids = ExecuteFilter(firstAidsDB, f);
+            var ids = firstAids.Select(x => x.id).ToList();
 
             var analytics = new AnalyticsDTO();
 
@@ -120,6 +122,7 @@ namespace RedCrossBackend.Controllers
             //byInjury
             var injuries = _context.Injury.ToList();
             var fainjuries = _context.FAInjury.ToList();
+            fainjuries = fainjuries.Where(x => ids.Contains(x.FAId)).ToList();
             var injuryList = new List<Combination>();
             foreach (var el in injuries)
                 if(fainjuries.Where(x => x.IId == el.id).Count()>0)
@@ -129,6 +132,7 @@ namespace RedCrossBackend.Controllers
             //byAssistance
             var assistances = _context.Assistance.ToList();
             var faassistances = _context.FAAssistance.ToList();
+            faassistances = faassistances.Where(x => ids.Contains(x.FAId)).ToList();
             var assistanceList = new List<Combination>();
             foreach (var el in assistances)
                 if(faassistances.Where(x => x.AId == el.id).Count()>0)
@@ -340,26 +344,31 @@ namespace RedCrossBackend.Controllers
         {
             var rawList = new List<FirstAidRaw>();
             var firstAidsDB = _context.FirstAid;
-            var inj = _context.Injury.ToList();
-            var ass = _context.Assistance.ToList();
-            var pht = _context.PhType.ToList();
+            //var inj = _context.Injury.ToList();
+            //var ass = _context.Assistance.ToList();
+            //var pht = _context.PhType.ToList();
 
             var firstAids = ExecuteFilter(firstAidsDB, f);
 
+            //var injfa = _context.FAInjury.ToList();
+            //var assfa = _context.FAAssistance.ToList();
+            //var phtdfa = _context.FaphType.ToList();
+
+
+            var injJoin = _context.Injury.Join(_context.FAInjury,
+                inj => inj.id, 
+                fa => fa.IId, 
+                (inj, fa) => new { Inj = inj, Fa = fa }).ToList();
+            var assJoin = _context.Assistance.Join(_context.FAAssistance, ass => ass.id, fa => fa.AId, (ass, fa) => new { Ass = ass, Fa = fa }).ToList();
+            var phtJoin = _context.PhType.Join(_context.FaphType, ph => ph.id, fa => fa.PTId, (ph, fa) => new { Ph = ph, Fa = fa }).ToList();
+
             foreach (var fa in firstAids)
             {
-                string injuries = "";
-                string assistances = "";
-                string phtypes = "";
-                var t = _context.FAInjury.Where(x => x.FAId == fa.id).ToList();
-                var asss = _context.FAAssistance.Where(x => x.FAId == fa.id).ToList();
-                var phtdd = _context.FaphType.Where(x => x.FAId == fa.id).ToList();
-                foreach (var i in _context.FAInjury.Where(x => x.FAId == fa.id).ToList())
-                    injuries += ((injuries.Equals("")) ? "" : ", ") + inj.FirstOrDefault(x => x.id == i.IId).name;
-                foreach (var a in _context.FAAssistance.Where(x => x.FAId == fa.id).ToList())
-                    assistances += ((assistances.Equals("")) ? "" : ", ") + ass.FirstOrDefault(x => x.id == a.AId).name;
-                foreach (var p in _context.FaphType.Where(x => x.FAId == fa.id).ToList())
-                    phtypes += ((phtypes.Equals("")) ? "" : ", ") + pht.FirstOrDefault(x => x.id == p.PTId).name;
+
+
+                string injuries = string.Join(", ", injJoin.Where(x => x.Fa.FAId == fa.id).Select(x => x.Inj.name));
+                string assistances = string.Join(", ", assJoin.Where(x => x.Fa.FAId == fa.id).Select(x => x.Ass.name));
+                string phtypes = string.Join(", ", phtJoin.Where(x => x.Fa.FAId == fa.id).Select(x => x.Ph.name));
                 rawList.Add(new FirstAidRaw(fa, injuries, assistances, phtypes));
             }
 
