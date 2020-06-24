@@ -7,12 +7,27 @@ namespace RedCrossBackend.Model.DTO
 {
     public class Combination
     {
-        public string text { get; set; }
-        public int amount { get; set; }
+        public string name { get; set; }
+        public int y { get; set; }
         public Combination(string text, int amount)
         {
-            this.text = text;
-            this.amount = amount;
+            this.name = text;
+            this.y = amount;
+        }
+    }
+    public class StatsMap
+    {
+        public double centerLatitude { get; set; }
+        public double centerLongitude { get; set; }
+        public List<Coordinates> coordinates { get; set; }
+        public StatsMap(List<Coordinates> coo)
+        {
+            this.coordinates = coo;
+            if(coo.Count() > 0)
+            {
+                this.centerLatitude = coo.Average(x => x.latitude);
+                this.centerLongitude = coo.Average(x => x.longitude);
+            }
         }
     }
     public class Coordinates
@@ -31,7 +46,7 @@ namespace RedCrossBackend.Model.DTO
         public List<Combination> byEducation { get; set; }
         public List<Combination> byCorrectSolution { get; set; }
         public List<Combination> byHospitalization { get; set; }
-        public List<Coordinates> byMap { get; set; }
+        public StatsMap byMap { get; set; }
         public List<Combination> byGender { get; set; }
         public List<Combination> byNumberTraining { get; set; }
         public List<Combination> byInjury { get; set; }
