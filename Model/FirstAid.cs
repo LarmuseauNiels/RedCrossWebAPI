@@ -47,7 +47,7 @@ namespace RedCrossBackend.Model
             this.hospitalisationRequired = fa.hospitalisationRequired;
             this.country = fa.country;
     }
-        public void EditBooleans()
+        public void NullToDefault()
         {
             if (this.hadFATraining == null)
                 this.hadFATraining = false;

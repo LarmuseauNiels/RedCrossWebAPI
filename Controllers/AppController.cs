@@ -39,7 +39,7 @@ namespace RedCrossBackend.Controllers
             });
             GeocodeResponse resp = r2.Result;
             firstAid.country = resp.Address.Country;
-            firstAid.EditBooleans();
+            firstAid.NullToDefault();
             _context.FirstAid.Add(firstAid);
             _context.SaveChanges();
             var id = _context.FirstAid.OrderByDescending(x => x.id).FirstOrDefault().id;
