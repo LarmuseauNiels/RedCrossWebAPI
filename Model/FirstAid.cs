@@ -20,7 +20,7 @@ namespace RedCrossBackend.Model
         public double latitude { get; set; }
         public string setting { get; set; }
         public int? confidentApplyingFA { get; set; }
-        public bool? phNeeded { get; set; }
+        public string phNeeded { get; set; }
         public string phTimeToArrive { get; set; }
         public string hospitalisationRequired { get; set; }
         public string country { get; set; }
@@ -56,7 +56,7 @@ namespace RedCrossBackend.Model
             if (this.blendedTraining == null)
                 this.blendedTraining = false;
             if (this.phNeeded == null)
-                this.phNeeded = false;
+                this.phNeeded = "Empty";
     }
     }
 }

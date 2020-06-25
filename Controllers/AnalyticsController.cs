@@ -159,11 +159,10 @@ namespace RedCrossBackend.Controllers
             analytics.byBlended = CalculateCombinationAnalytics(firstAids, 7);
 
             //byPercentProfHelp
-            double perc = (firstAids.Count()>0)?firstAids.Where(x => (x.phNeeded == null)?false:(bool)x.phNeeded).Count() / firstAids.Count()*100:0.0;
-            analytics.byPercentProfHelp = perc;
+            var byPhNeeded = CalculateCombinationAnalytics(firstAids, 8);
+            analytics.byProfHelp = byPhNeeded;
 
             return analytics;
-            
         }
         
         [HttpGet]
@@ -300,6 +299,9 @@ namespace RedCrossBackend.Controllers
                 case 7:
                     distincts = fas.Where(x => x.blendedTraining != null).Select(x => (x.blendedTraining != null) ? x.blendedTraining.ToString():null).Distinct().ToList();
                     break;
+                case 8:
+                    distincts = fas.Where(x => x.phNeeded != null).Select(x => x.phNeeded).Distinct().ToList();
+                    break;
             }
             var list = new List<Combination>();
             foreach (var el in distincts)
@@ -334,6 +336,10 @@ namespace RedCrossBackend.Controllers
                     case 7:
                         count = fas.Where(x => x.blendedTraining != null && x.blendedTraining.ToString().Equals(el)).Count();
                         break;
+                    //PhNeeded
+                    case 8:
+                        count = fas.Where(x => x.phNeeded != null && x.phNeeded.Equals(el)).Count();
+                        break;
                 }
                 list.Add(new Combination(el,count));
             }
@@ -344,15 +350,8 @@ namespace RedCrossBackend.Controllers
         {
             var rawList = new List<FirstAidRaw>();
             var firstAidsDB = _context.FirstAid;
-            //var inj = _context.Injury.ToList();
-            //var ass = _context.Assistance.ToList();
-            //var pht = _context.PhType.ToList();
 
             var firstAids = ExecuteFilter(firstAidsDB, f);
-
-            //var injfa = _context.FAInjury.ToList();
-            //var assfa = _context.FAAssistance.ToList();
-            //var phtdfa = _context.FaphType.ToList();
 
 
             var injJoin = _context.Injury.Join(_context.FAInjury,

@@ -121,7 +121,7 @@ namespace RedCrossBackend.Model
                     .HasColumnName("otherTrainingProvider")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.phNeeded).HasColumnName("phNeeded");
+                entity.Property(e => e.phNeeded).HasColumnName("phNeeded").HasMaxLength(50);
 
                 entity.Property(e => e.phTimeToArrive).HasColumnName("phTimeToArrive")
                     .HasMaxLength(50);

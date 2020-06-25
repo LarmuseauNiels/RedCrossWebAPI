@@ -53,6 +53,6 @@ namespace RedCrossBackend.Model.DTO
         public List<Combination> byAssistance { get; set; }
         public List<Combination> byTraining { get; set; }
         public List<Combination> byBlended { get; set; }
-        public double byPercentProfHelp { get; set; }
+        public List<Combination> byProfHelp { get; set; }
     }
 }
