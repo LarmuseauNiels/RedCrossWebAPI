@@ -115,7 +115,7 @@ namespace RedCrossBackend.Model
                     .HasColumnName("macAddress")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.numberOffATtraining).HasColumnName("numberOffATtraining");
+                entity.Property(e => e.numberOffFATtraining).HasColumnName("numberOffFATtraining");
 
                 entity.Property(e => e.otherTrainingProvider)
                     .HasColumnName("otherTrainingProvider")

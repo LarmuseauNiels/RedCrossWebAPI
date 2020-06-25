@@ -35,7 +35,7 @@ namespace RedCrossBackend.Controllers
         [Route("assistances")]
         public ActionResult<IEnumerable<string>> GetAssistances()
         {
-            var ass = _context.Assistance.Where(x => x.name != null).Select(x=>x.name).ToList();
+            var ass = _context.Assistance.Where(x => x.name != null).Select(x=>x.name).OrderBy(x=>x).ToList();
             if(ass.Count > 0)
             {
                 return ass;
@@ -47,7 +47,7 @@ namespace RedCrossBackend.Controllers
         [Route("injuries")]
         public ActionResult<IEnumerable<string>> GetInjuries()
         {
-            var inj = _context.Injury.Where(x => x.name != null).Select(x => x.name).ToList();
+            var inj = _context.Injury.Where(x => x.name != null).Select(x => x.name).OrderBy(x => x).ToList();
             if (inj.Count > 0)
             {
                 return inj;
@@ -59,7 +59,7 @@ namespace RedCrossBackend.Controllers
         [Route("countries")]
         public ActionResult<IEnumerable<string>> GetCountries()
         {
-            var countries = _context.FirstAid.Where(x => x.country != null).Select(x => x.country).Distinct().ToList();
+            var countries = _context.FirstAid.Where(x => x.country != null).Select(x => x.country).OrderBy(x => x).Distinct().ToList();
             if (countries.Count > 0)
             {
                 return countries;
@@ -71,12 +71,23 @@ namespace RedCrossBackend.Controllers
         [Route("educations")]
         public ActionResult<IEnumerable<string>> GetEductations()
         {
-            var educations = _context.FirstAid.Where(x => x.education != null).Select(x => x.education).Distinct().ToList();
+            var educations = _context.FirstAid.Where(x => x.education != null).Select(x => x.education).OrderBy(x => x).Distinct().ToList();
             if (educations.Count > 0)
             {
                 return educations;
             }
             return BadRequest("No Educations Found");
+        }
+        [HttpGet]
+        [Route("ages")]
+        public ActionResult<IEnumerable<string>> GetAges()
+        {
+            var ages = _context.FirstAid.Where(x => x.age != null).Select(x => x.age).OrderBy(x => x).Distinct().ToList();
+            if (ages.Count > 0)
+            {
+                return ages;
+            }
+            return BadRequest("No Ages Found");
         }
 
 
@@ -293,7 +304,7 @@ namespace RedCrossBackend.Controllers
                     break;
                 //numbertraining
                 case 6:
-                    distincts = fas.Where(x => x.numberOffATtraining != null).Select(x => (x.numberOffATtraining != null) ? x.numberOffATtraining.ToString():null).Distinct().ToList();
+                    distincts = fas.Where(x => x.numberOffFATtraining != null).Select(x => (x.numberOffFATtraining != null) ? x.numberOffFATtraining.ToString():null).Distinct().ToList();
                     break;
                 //blended
                 case 7:
@@ -330,7 +341,7 @@ namespace RedCrossBackend.Controllers
                         break;
                     //numbertraining
                     case 6:
-                        count = fas.Where(x => x.numberOffATtraining != null && x.numberOffATtraining.ToString().Equals(el)).Count();
+                        count = fas.Where(x => x.numberOffFATtraining != null && x.numberOffFATtraining.ToString().Equals(el)).Count();
                         break;
                     //blended
                     case 7:

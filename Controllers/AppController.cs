@@ -30,13 +30,15 @@ namespace RedCrossBackend.Controllers
             FirstAid firstAid = dto;
             ReverseGeocoder y = new ReverseGeocoder();
 
-            Task<GeocodeResponse> r2 = y.ReverseGeocode(new ReverseGeocodeRequest
+            var t = new ReverseGeocodeRequest
             {
                 Latitude = firstAid.latitude,
                 Longitude = firstAid.longitude,
+                PreferredLanguages = "en",
 
-
-            });
+            };
+            Task<GeocodeResponse> r2 = y.ReverseGeocode(t);
+            
             GeocodeResponse resp = r2.Result;
             firstAid.country = resp.Address.Country;
             firstAid.NullToDefault();
