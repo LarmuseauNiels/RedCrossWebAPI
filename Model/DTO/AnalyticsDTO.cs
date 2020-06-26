@@ -5,6 +5,38 @@ using System.Threading.Tasks;
 
 namespace RedCrossBackend.Model.DTO
 {
+    public class AgeRange
+    {
+        public string range { get; set; }
+        public int startyear { get; set; }
+        public int endYear { get; set; }
+        public AgeRange(string range,int end, int start)
+        {
+            this.range = range;
+            this.startyear = start;
+            this.endYear = end;
+        }
+    }
+    public static class AgeRanges
+    {
+        public static List<AgeRange> GetAgeRanges()
+        {
+            var list = new List<AgeRange>();
+            list.Add(new AgeRange("<15", 0, 15));
+            int age = 15;
+            for(int i = 0; i < 7; i++)
+            {
+                list.Add(new AgeRange(age + "-" + (age + 10), age, age + 10));
+                age += 10;
+            }
+
+            list.Add(new AgeRange(">85", 85, 150));
+            return list;
+        }
+
+
+
+    }
     public class Combination
     {
         public string name { get; set; }

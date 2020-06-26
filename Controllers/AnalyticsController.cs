@@ -82,7 +82,7 @@ namespace RedCrossBackend.Controllers
         [Route("ages")]
         public ActionResult<IEnumerable<string>> GetAges()
         {
-            var ages = _context.FirstAid.Where(x => x.age != null).Select(x => x.age).OrderBy(x => x).Distinct().ToList();
+            var ages = AgeRanges.GetAgeRanges().Select(x => x.range).ToList(); ;
             if (ages.Count > 0)
             {
                 return ages;
@@ -104,7 +104,7 @@ namespace RedCrossBackend.Controllers
             var analytics = new AnalyticsDTO();
 
             //byAge
-            analytics.byAge = CalculateCombinationAnalytics(firstAids,1);
+            analytics.byAge = CalculateCombinationAgeAnalytics(firstAids,1);
 
             //byEducation
             analytics.byEducation = CalculateCombinationAnalytics(firstAids, 2);
@@ -125,10 +125,10 @@ namespace RedCrossBackend.Controllers
             analytics.byMap = new StatsMap(mapList);
 
             //byGender
-            analytics.byGender = CalculateCombinationAnalytics(firstAids, 5);
+            analytics.byGender = CalculateCombinationAnalytics(firstAids, 5).OrderBy(x => x.name).ToList();
 
             //byNumberTraining
-            analytics.byNumberTraining = CalculateCombinationAnalytics(firstAids, 6);
+            analytics.byNumberTraining = CalculateCombinationAnalytics(firstAids, 6).OrderBy(x => x.name).ToList();
 
             //byInjury
             var injuries = _context.Injury.ToList();
@@ -138,7 +138,7 @@ namespace RedCrossBackend.Controllers
             foreach (var el in injuries)
                 if(fainjuries.Where(x => x.IId == el.id).Count()>0)
                 injuryList.Add(new Combination(el.name,fainjuries.Where(x=>x.IId == el.id).Count()));
-            analytics.byInjury = injuryList;
+            analytics.byInjury = injuryList.OrderBy(x=>x.name).ToList();
 
             //byAssistance
             var assistances = _context.Assistance.ToList();
@@ -148,7 +148,7 @@ namespace RedCrossBackend.Controllers
             foreach (var el in assistances)
                 if(faassistances.Where(x => x.AId == el.id).Count()>0)
                 assistanceList.Add(new Combination(el.name, faassistances.Where(x => x.AId == el.id).Count()));
-            analytics.byAssistance = assistanceList;
+            analytics.byAssistance = assistanceList.OrderBy(x => x.name).ToList();
 
             //byTraining
             var trainingList = new List<Combination>();
@@ -234,7 +234,17 @@ namespace RedCrossBackend.Controllers
             if (!string.IsNullOrEmpty(f.gender))
                 query = query.Where(x => x.gender != null && x.gender.Equals(f.gender));
             if (!string.IsNullOrEmpty(f.age))
-                query = query.Where(x => x.age != null && x.age.Equals(f.age));
+            {
+                var ageRange = AgeRanges.GetAgeRanges().FirstOrDefault(x => x.range.Equals(f.age));
+                int start = DateTime.Now.Year - ageRange.startyear;
+                int end = DateTime.Now.Year - ageRange.endYear;
+                List<string> years = new List<string>();
+                for(int i = start+1; i <= end; i++)
+                {
+                    years.Add(i.ToString());
+                }
+                query = query.Where(x => x.age != null && years.Contains(x.age));
+            }
             if (!string.IsNullOrEmpty(f.country))
                 query = query.Where(x => x.country != null && x.country.Equals(f.country));
             if (f.from.HasValue)
@@ -384,7 +394,28 @@ namespace RedCrossBackend.Controllers
 
             return rawList;
         }
+
+
+        private List<Combination> CalculateCombinationAgeAnalytics(List<FirstAid> fas, int param)
+        {
+            var f = fas.OrderByDescending(x=>x.age).ToList();
+            var ageranges = AgeRanges.GetAgeRanges();
+
+            foreach (var el in f)
+            {
+                AgeRange ar = null;
+                int year = DateTime.Now.Year;
+                if (int.TryParse(el.age, out int a))
+                {
+                    ar = ageranges.FirstOrDefault(x => year-x.startyear < a && year-x.endYear >= a);
+                    el.age = ar.range;
+                }
+            }
+
+            return CalculateCombinationAnalytics(f, param);
+        }
     }
+
     public class Filter
     {
         public string gender { get; set; }

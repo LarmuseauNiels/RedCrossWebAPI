@@ -56,7 +56,7 @@ namespace RedCrossBackend.Model
             if (this.blendedTraining == null)
                 this.blendedTraining = false;
             if (this.phNeeded == null)
-                this.phNeeded = "Empty";
+                this.phNeeded = "Unknown";
             if (this.assignDate == null)
                 this.assignDate = DateTime.Now;
             if (this.hospitalisationRequired == null)
